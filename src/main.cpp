@@ -1530,12 +1530,10 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
             vInOutPoints.insert(txin.prevout);
     }
 
-//FIXME akuma
     if (tx.IsCoinBase()) {
-/*        if (tx.vin[0].scriptSig.size() < 2 || tx.vin[0].scriptSig.size() > 150)
+        if (tx.vin[0].scriptSig.size() < 2 || tx.vin[0].scriptSig.size() > 150)
             return state.DoS(100, error("CheckTransaction() : coinbase script size=%d", tx.vin[0].scriptSig.size()),
                 REJECT_INVALID, "bad-cb-length");
-*/
     } else if (fZerocoinActive && tx.IsZerocoinSpend()) {
         if(tx.vin.size() < 1 || static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxSpendsPerTransaction())
             return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
@@ -2356,20 +2354,15 @@ int64_t GetBlockValue(int nHeight)
 {
     int64_t nSubsidy = 30 *COIN;
 
-    if(nHeight > 0 && nHeight <= 10){
+    if(nHeight > 0 && nHeight <= 5){
+        return 400000 * COIN;
+    } else if(nHeight > 5  && nHeight<= 10){
         return 20000 * COIN;
+    } else if(nHeight > 10 && nHeight<= Params().LAST_POW_BLOCK() ) {
+    	return 200 * COIN;
+    } else {
+	return 5 * COIN;
     }
-    if(nHeight > 10  && nHeight<= 200){
-        return 100 * COIN;
-    }
-    return 5 * COIN;
-
-    if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-        if (nHeight < 200 && nHeight > 0)
-            return 250000 * COIN;
-    }
-
-
     return nSubsidy;
 }
 

@@ -134,7 +134,7 @@ public:
         nMaxMoneyOut = 21000000 * COIN;
 
         /** Height or Time Based Activations **/
-        nLastPOWBlock = 200;
+        nLastPOWBlock = 210;
         nModifierUpdateBlock = 615800;
         nZerocoinStartHeight = 209467;
         nZerocoinStartTime = 1536314400; // september 7, 2018 12:00:00 UTC
@@ -251,7 +251,7 @@ public:
         nMinerThreads = 0;
         nTargetTimespan = 1 * 45; // VITAE: 1 day
         nTargetSpacing = 1 * 45;  // VITAE: 1 minute
-        nLastPOWBlock = 200;
+        nLastPOWBlock = 210;
         nMaturity = 15;
         nFundamentalnodeCountDrift = 4;
         nMasternodeCountDrift = 4;

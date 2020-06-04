@@ -125,7 +125,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     pblock->vtx.push_back(txNew);
     pblocktemplate->vTxFees.push_back(-1);   // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
-
+LogPrintf("MMM 1 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
     // ppcoin: if coinstake available add coinstake tx
     static int64_t nLastCoinStakeSearchTime = GetAdjustedTime(); // only initialized at startup
 
@@ -152,6 +152,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         if (!fStakeFound)
             return NULL;
     }
+LogPrintf("MMM 2 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
     bool bMasterNodePayment = false;
 
@@ -180,6 +181,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     // until there are no more or the block reaches this size:
     unsigned int nBlockMinSize = GetArg("-blockminsize", DEFAULT_BLOCK_MIN_SIZE);
     nBlockMinSize = std::min(nBlockMaxSize, nBlockMinSize);
+
+LogPrintf("MMM 3 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
     // Collect memory pool transactions into the block
     CAmount nFees = 0;
@@ -280,6 +283,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             } else
                 vecPriority.push_back(TxPriority(dPriority, feeRate, &mi->second.GetTx()));
         }
+LogPrintf("MMM 4 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
         // Collect transactions into block
         uint64_t nBlockSize = 1000;
@@ -407,6 +411,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 }
             }
         }
+LogPrintf("MMM 5 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
         if (!fProofOfStake) {
             //Fundamentalnode and general budget payments
@@ -424,8 +429,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         // Compute final coinbase transaction.
         pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
+LogPrintf("MMM 5.5 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
         if (!fProofOfStake) {
             pblock->vtx[0] = txNew;
+//FIXME akuma
+	    pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
             pblocktemplate->vTxFees[0] = -nFees;
         }
 
@@ -439,17 +447,20 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         if(fZerocoinActive && !CalculateAccumulatorCheckpoint(nHeight, nCheckpoint)){
             LogPrintf("%s: failed to get accumulator checkpoint\n", __func__);
         }
+LogPrintf("MMM 6 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
+
         pblock->nAccumulatorCheckpoint = nCheckpoint;
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
+LogPrintf("MMM 7 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
         CValidationState state;
+//FIXME akuma
         if (!TestBlockValidity(state, *pblock, pindexPrev, false, false)) {
             LogPrintf("CreateNewBlock() : TestBlockValidity failed\n");
             mempool.clear();
             return NULL;
         }
     }
-
     return pblocktemplate.release();
 }
 

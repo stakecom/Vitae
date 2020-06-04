@@ -263,6 +263,7 @@ bool IsBlockPayeeValid(const CBlock& block, int nBlockHeight)
 
 void FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, bool fProofOfStake)
 {
+LogPrintf("MMM FillBlockPayee \n");
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return;
 
@@ -284,6 +285,7 @@ std::string GetRequiredPaymentsString(int nBlockHeight)
 
 void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFees, bool fProofOfStake)
 {
+LogPrintf("MMM CMasternodePayments::FillBlockPayee\n");
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return;
 
