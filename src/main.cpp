@@ -2354,11 +2354,11 @@ int64_t GetBlockValue(int nHeight)
 {
     int64_t nSubsidy = 30 *COIN;
 
-    if(nHeight > 0 && nHeight <= 5){
+    if(nHeight >= 0 && nHeight < 5){
         return 400000 * COIN;
-    } else if(nHeight > 5  && nHeight<= 10){
+    } else if(nHeight >= 5  && nHeight< 10){
         return 20000 * COIN;
-    } else if(nHeight > 10 && nHeight<= Params().LAST_POW_BLOCK() ) {
+    } else if(nHeight >= 10 && nHeight< Params().LAST_POW_BLOCK() ) {
     	return 200 * COIN;
     } else {
 	return 5 * COIN;

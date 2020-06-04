@@ -338,7 +338,7 @@ public:
     CMasternodePayments() {
 
         // 100: G=0 101: MK just test
-        strMainPubKey = "04a4507dbe3d96b7f2acf54962a080a91870f25e47efc8da85129ee2043cb4407aebfe3232ef3f7ec949e7a3b9bd5681387b211e096277637f7ec5de4c72d30d72"; // bitsenddev 04-2015
+        strMainPubKey = "0404507dbe3d96b7f2acf54962a080a91870f25e47efc8da85129ee2043cb4407aebfe3232ef3f7ec949e7a3b9bd5681387b211e096277637f7ec5de4c72d30d72"; // bitsenddev 04-2015
         strTestPubKey = "04a1ad614d77b5e016e56252d0be619de16e3ee7b74b6d37d7b2437ee0ff0754de2ca8e4234c0daedf8deca501d7a4d74d3c8c196ec344e4f9f757b3efd91e2ed8";  // bitsenddev do not use 04-2015
         enabled = false;
     }

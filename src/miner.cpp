@@ -125,7 +125,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     pblock->vtx.push_back(txNew);
     pblocktemplate->vTxFees.push_back(-1);   // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
-LogPrintf("MMM 1 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
     // ppcoin: if coinstake available add coinstake tx
     static int64_t nLastCoinStakeSearchTime = GetAdjustedTime(); // only initialized at startup
 
@@ -152,7 +151,6 @@ LogPrintf("MMM 1 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size
         if (!fStakeFound)
             return NULL;
     }
-LogPrintf("MMM 2 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
     bool bMasterNodePayment = false;
 
@@ -182,7 +180,6 @@ LogPrintf("MMM 2 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size
     unsigned int nBlockMinSize = GetArg("-blockminsize", DEFAULT_BLOCK_MIN_SIZE);
     nBlockMinSize = std::min(nBlockMaxSize, nBlockMinSize);
 
-LogPrintf("MMM 3 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
     // Collect memory pool transactions into the block
     CAmount nFees = 0;
@@ -283,7 +280,6 @@ LogPrintf("MMM 3 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size
             } else
                 vecPriority.push_back(TxPriority(dPriority, feeRate, &mi->second.GetTx()));
         }
-LogPrintf("MMM 4 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
         // Collect transactions into block
         uint64_t nBlockSize = 1000;
@@ -411,7 +407,6 @@ LogPrintf("MMM 4 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size
                 }
             }
         }
-LogPrintf("MMM 5 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
         if (!fProofOfStake) {
             //Fundamentalnode and general budget payments
@@ -429,7 +424,6 @@ LogPrintf("MMM 5 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size
 
         // Compute final coinbase transaction.
         pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
-LogPrintf("MMM 5.5 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
         if (!fProofOfStake) {
             pblock->vtx[0] = txNew;
 //FIXME akuma
@@ -447,11 +441,9 @@ LogPrintf("MMM 5.5 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.si
         if(fZerocoinActive && !CalculateAccumulatorCheckpoint(nHeight, nCheckpoint)){
             LogPrintf("%s: failed to get accumulator checkpoint\n", __func__);
         }
-LogPrintf("MMM 6 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
         pblock->nAccumulatorCheckpoint = nCheckpoint;
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
-LogPrintf("MMM 7 coinbase script size=%d\n",pblock->vtx[0].vin[0].scriptSig.size());
 
         CValidationState state;
 //FIXME akuma
@@ -543,15 +535,17 @@ int nMintableLastCheck = 0;
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 {
-    LogPrintf("VITAEMiner started\n");
+    LogPrintf("VITAE-DIGGER started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-    RenameThread("vitae-miner");
-
+    RenameThread("vitae-digger");
+LogPrintf("MMM BitcoinMiner 1\n");
     // Each thread has its own key and counter
     CReserveKey reservekey(pwallet);
     unsigned int nExtraNonce = 0;
 
     while (fGenerateBitcoins || fProofOfStake) {
+LogPrintf("MMM BitcoinMiner 2\n");
+
         if (fProofOfStake) {
             //control the amount of times the client will check for mintable coins
             if ((GetTime() - nMintableLastCheck > 5 * 60)) // 5 minute check time
@@ -590,7 +584,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 }
             }
         }
-
+LogPrintf("MMM BitcoinMiner 2\n");
         MilliSleep(700);
 
         //
@@ -624,7 +618,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 
             continue;
         }
-
+LogPrintf("MMM BitcoinMiner 3\n");
         LogPrintf("Running VITAEMiner with %u transactions in block (%u bytes)\n", pblock->vtx.size(),
             ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
@@ -683,12 +677,13 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                     }
                 }
             }
-
+//LogPrintf("MMM BitcoinMiner 4\n");
             // Check for stop or if block needs to be rebuilt
             boost::this_thread::interruption_point();
             // Regtest mode doesn't require peers
-            if (vNodes.empty() && Params().MiningRequiresPeers())
-                break;
+//FIXME akuma
+//            if (vNodes.empty() && Params().MiningRequiresPeers())
+//                break;
             if (pblock->nNonce >= 0xffff0000)
                 break;
             if (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 60)

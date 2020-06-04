@@ -360,7 +360,7 @@ std::string GetRequiredPaymentsString(int nBlockHeight)
 
 void CFundamentalnodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFees, bool fProofOfStake, bool IsMasternode)
 {
-LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 1\n");
 
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return;
@@ -369,19 +369,22 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
     bool hasMnPayment = true;
     CScript payee;
     CScript mn_payee;
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 2\n");
     //spork
     if (!fundamentalnodePayments.GetBlockPayee(pindexPrev->nHeight + 1, payee)) {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 2.1\n");
         //no fundamentalnode detected
         CFundamentalnode* winningNode = mnodeman.GetCurrentFundamentalNode(1);
         if (winningNode) {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 2.1.1\n");
             payee = GetScriptForDestination(winningNode->pubKeyCollateralAddress.GetID());
         } else {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 2.1.2\n");
             LogPrint("fundamentalnode","CreateNewBlock: Failed to detect fundamentalnode to pay\n");
             hasPayment = false;
         }
     }
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 3\n");
     //    bool bMasterNodePayment = false;
 
     //    if ( Params().NetworkID() == CBaseChainParams::TESTNET ){
@@ -395,26 +398,32 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
     //    }//
 
     if(!masternodePayments.GetBlockPayee(pindexPrev->nHeight+1, mn_payee)){
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 3.1\n");
         //no masternode detected
         CMasternode* winningNode = m_nodeman.GetCurrentMasterNode(1);
         if(winningNode){
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 3.1.1\n");
             mn_payee = GetScriptForDestination(winningNode->pubkey.GetID());
         } else {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 3.1.2\n");
             LogPrintf("CreateNewBlock: Failed to detect masternode to pay\n");
             hasMnPayment = false;
         }
     }
 
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 4\n");
     CAmount blockValue = GetBlockValue(pindexPrev->nHeight);
     CAmount fundamentalnodePayment = GetFundamentalnodePayment(pindexPrev->nHeight + 1, blockValue);
     CAmount masternodepayment = GetMasternodePayment(pindexPrev->nHeight +1 , blockValue);
 
     //txNew.vout[0].nValue = blockValue;
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5 blockValue=%f,fundamentalnodePayment=%f,masternodepayment=%f\n",blockValue/COIN,fundamentalnodePayment/COIN,masternodepayment/COIN);
     if (hasPayment) {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1\n");
         if(IsMasternode && hasMnPayment){
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.1\n");
             if (fProofOfStake) {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.1.1\n");
                 /**For Proof Of Stake vout[0] must be null
                  * Stake reward can be split into many different outputs, so we must
                  * use vout.size() to align with several different cases.
@@ -430,6 +439,7 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
                 //subtract mn payment from the stake reward
                 txNew.vout[i - 1].nValue -= (fundamentalnodePayment + masternodepayment);
             } else {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.1.2\n");
                 txNew.vout.resize(3);
                 txNew.vout[2].scriptPubKey = mn_payee;
                 txNew.vout[2].nValue = masternodepayment;
@@ -437,7 +447,7 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
                 txNew.vout[1].nValue = fundamentalnodePayment;
                 txNew.vout[0].nValue = blockValue - (fundamentalnodePayment + masternodepayment);
             }
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.2\n");
             CTxDestination address1;
             ExtractDestination(payee, address1);
             CBitcoinAddress address2(address1);
@@ -452,6 +462,7 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
             LogPrint("masternode","Masternode payment of %s to %s\n", FormatMoney(masternodepayment).c_str(), address4.ToString().c_str());
 
         } else {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.3\n");
 
             if (fProofOfStake) {
                 /**For Proof Of Stake vout[0] must be null
@@ -459,6 +470,7 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
              * use vout.size() to align with several different cases.
              * An additional output is appended as the fundamentalnode payment
              */
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.4\n");
                 unsigned int i = txNew.vout.size();
                 txNew.vout.resize(i + 1);
                 txNew.vout[i].scriptPubKey = payee;
@@ -467,12 +479,13 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
                 //subtract mn payment from the stake reward
                 txNew.vout[i - 1].nValue -= fundamentalnodePayment;
             } else {
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.5\n");
                 txNew.vout.resize(2);
                 txNew.vout[1].scriptPubKey = payee;
                 txNew.vout[1].nValue = fundamentalnodePayment;
                 txNew.vout[0].nValue = blockValue - fundamentalnodePayment;
             }
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.1.6\n");
             CTxDestination address1;
             ExtractDestination(payee, address1);
             CBitcoinAddress address2(address1);
@@ -480,7 +493,7 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
             LogPrint("fundamentalnode","Fundamentalnode payment of %s to %s\n", FormatMoney(fundamentalnodePayment).c_str(), address2.ToString().c_str());
         }
     } else {
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.2\n");
         if(IsMasternode && hasMnPayment){
             if (fProofOfStake) {
                 /**For Proof Of Stake vout[0] must be null
@@ -511,19 +524,19 @@ LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee\n");
             LogPrint("masternode","Masternode payment of %s to %s\n", FormatMoney(masternodepayment).c_str(), address4.ToString().c_str());
 
 
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.3\n");
         } else {
 
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.4\n");
             if (fProofOfStake) {
                 /**For Proof Of Stake vout[0] must be null
              * Stake reward can be split into many different outputs, so we must
              * use vout.size() to align with several different cases.
              * An additional output is appended as the fundamentalnode payment
              */
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.6\n");
             } else {
-
+LogPrintf("MMM CFundamentalnodePayments::FillBlockPayee 5.7\n");
                 txNew.vout[0].nValue = blockValue ;
             }
 
