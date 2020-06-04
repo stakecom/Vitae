@@ -3961,6 +3961,7 @@ bool static DisconnectTip(CValidationState& state)
     mempool.removeCoinbaseSpends(pcoinsTip, pindexDelete->nHeight);
     mempool.check(pcoinsTip);
     // Update chainActive and related variables.
+LogPrintf("MMM disconnect tip.\n");
     UpdateTip(pindexDelete->pprev);
     // Let wallets know transactions went from 1-confirmed to
     // 0-confirmed or conflicted:
@@ -4036,6 +4037,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
     mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted);
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
+LogPrintf("MMM connect tip.\n");
     UpdateTip(pindexNew);
     // Tell wallet about transactions that went from mempool
     // to conflicted:
