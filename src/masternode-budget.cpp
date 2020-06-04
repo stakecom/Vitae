@@ -490,6 +490,7 @@ void CBudgetManager::CheckAndRemove()
 
 void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, bool fProofOfStake)
 {
+LogPrintf("MMM CBudgetManager::FillBlockPayee\n");
     LOCK(cs);
 
     CBlockIndex* pindexPrev = chainActive.Tip();
